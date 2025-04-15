@@ -2,83 +2,158 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            background: linear-gradient(135deg, #b3e5fc, #0288d1);
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            overflow: hidden;
         }
 
         .login-container {
-            background: #fff;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2.5rem 3rem;
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
             text-align: center;
-            width: 350px;
+            width: 480px;
+            position: relative;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            animation: glowBorder 5s infinite alternate;
+        }
+
+        @keyframes glowBorder {
+            0% {
+                box-shadow: 0 0 10px rgba(0,114,255,0.3);
+            }
+            100% {
+                box-shadow: 0 0 25px rgba(0,114,255,0.6);
+            }
         }
 
         h2 {
-            color: #333;
-            margin-bottom: 1rem;
+            color: #003366;
+            margin-bottom: 1.5rem;
+            font-size: 30px;
         }
 
         label {
             display: block;
-            margin: 10px 0 5px;
-            font-weight: bold;
-            color: #555;
+            margin: 14px 0 8px;
+            font-weight: 600;
+            color: #003366;
+            text-align: left;
+            font-size: 16px;
         }
 
         select, input {
             width: 100%;
-            padding: 8px;
-            margin-bottom: 15px;
+            padding: 12px 12px 12px 40px;
+            margin-bottom: 18px;
             border: 1px solid #ccc;
-            border-radius: 5px;
+            border-radius: 8px;
+            font-size: 15px;
+            background-color: #fdfdfd;
+            background-repeat: no-repeat;
+            background-position: 10px center;
+            transition: 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: #0072ff;
+            box-shadow: 0 0 6px rgba(0,114,255,0.5);
+        }
+
+        input[name="username"] {
+            background-image: url('https://img.icons8.com/ios-glyphs/30/user--v1.png');
+        }
+
+        input[name="password"] {
+            background-image: url('https://img.icons8.com/ios-glyphs/30/lock--v1.png');
+        }
+
+        select {
+            background-image: url('https://img.icons8.com/ios-glyphs/30/down-squared.png');
         }
 
         .btn {
             width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            background: #0072ff;
+            padding: 14px;
+            background-color: #0072ff;
             color: white;
-            font-size: 16px;
+            font-size: 17px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
             cursor: pointer;
-            transition: 0.3s;
+            margin-top: 10px;
+            transition: background 0.3s ease;
+            animation: pulse 2s infinite;
         }
 
         .btn:hover {
-            background: #005bb5;
+            background-color: #005bb5;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
         }
 
         .hidden {
             display: none;
         }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+            display: block !important;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media screen and (max-width: 500px) {
+            .login-container {
+                width: 90%;
+                padding: 2rem;
+            }
+        }
     </style>
 
     <script>
         function handleProceed() {
-            let role = document.getElementById("role").value;
-            let adminLoginForm = document.getElementById("admin-login");
+            const role = document.getElementById("role").value;
+            const adminLoginForm = document.getElementById("admin-login");
 
             if (role === "patient") {
-                window.location.href = "{% url 'predict' %}";  // Redirect patient to prediction page
+                window.location.href = "{% url 'predict' %}";
+            } else if (role === "admin") {
+                adminLoginForm.classList.remove("hidden");
+                adminLoginForm.classList.add("fade-in");
             } else {
-                adminLoginForm.classList.remove("hidden"); // Show admin login form
+                alert("Please select a role.");
             }
         }
     </script>
@@ -89,14 +164,15 @@
         <h2>Login</h2>
 
         <label for="role">Sign in as:</label>
-        <select id="role" name="role">
+        <select id="role" name="role" required>
+            <option value="" disabled selected>Select your role</option>
             <option value="patient">Patient</option>
             <option value="admin">Admin</option>
         </select>
 
         <button class="btn" onclick="handleProceed()">Proceed</button>
 
-        <!-- Admin Login Form (Hidden Initially) -->
+        <!-- Admin Login Form -->
         <div id="admin-login" class="hidden">
             <form method="post" action="{% url 'login_view' %}">
                 {% csrf_token %}
